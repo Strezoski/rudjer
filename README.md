@@ -1,0 +1,2 @@
+# ruger
+DNN za proteina
