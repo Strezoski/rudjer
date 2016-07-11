@@ -1,2 +1,2 @@
-# ruger
+# Rudjer
 DNN za proteina
