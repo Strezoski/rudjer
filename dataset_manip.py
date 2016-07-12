@@ -14,7 +14,7 @@ def convert_feature_members_float(feature):
 
     return tmp_array
 
-def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, features_per_entry, verbose=False):
+def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, features_per_entry, verbose=False, lstm_type=True):
     """
     Generates the datasets into numpy arrays compatible with Keras.
     :param dataset_path: The path to the textual file containing the dataset.
@@ -54,7 +54,12 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, feat
 
     X_train = numpy.array(X_train_aux)
     y_train = numpy.array(y_train_aux)
-    Y_train = np_utils.to_categorical(y_train)
+
+    if lstm_type:
+        Y_train = np_utils.to_categorical(y_train)
+    else:
+        Y_train = y_train
+
 
     if verbose:
         print "Training data shape: "+str(X_train.shape)
