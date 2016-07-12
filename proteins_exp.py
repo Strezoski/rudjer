@@ -15,7 +15,7 @@ numpy.random.seed(seed)
 #                                 verbose=True,
 #                                 lstm_type=True)
 
-X_train, y_train = load_dataset(dataset_path="/home/gstrezoski/dataset_2/reducedProperties.txt",
+X_train, y_train = load_dataset(dataset_path="/home/mbrbic/pingvin/data/astral35_random-or-permuted/reducedProperties_padded_test.txt",
                                 feature_delimiter=';',
                                 feature_member_delimiter=',',
                                 features_per_entry=100,
