@@ -21,7 +21,7 @@ X_train, y_train = load_dataset(dataset_path="/home/gstrezoski/dataset_2/reduced
                                 features_per_entry=100,
                                 verbose=True,
                                 lstm_type=True,
-                                variable_length=True,
+                                variable_length=False,
                                 max_length=1500)
 
 model = create_LSTM_model()
