@@ -1,12 +1,13 @@
 import numpy
 from datetime import datetime
 from keras.utils import np_utils
+from keras.preprocessing.sequence import pad_sequences
 
 def convert_feature_members_float(feature):
     """
     Converts the string values read from the file to floats.
     :param feature: The feature vector for the encoded character
-    :return:
+    :return: tmp_array: The converted array.
     """
     tmp_array = []
     for string in feature:
@@ -14,7 +15,7 @@ def convert_feature_members_float(feature):
 
     return tmp_array
 
-def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, features_per_entry, verbose=False, lstm_type=True):
+def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, features_per_entry, verbose=False, lstm_type=True, variable_length=False, max_length=100):
     """
     Generates the datasets into numpy arrays compatible with Keras.
     :param dataset_path: The path to the textual file containing the dataset.
@@ -22,7 +23,9 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, feat
     :param feature_member_delimiter: The delimiter inside the feature arrays.
     :param features_per_entry: Number of features per character in the sequence.
     :param verbose: Print out shapes and duration.
-    :return:
+    :param variable_length: If True than we set a zero padding on every sequence.
+    :param max_length: Specifies the max length og the sequence we apply zero padding to.
+    :return: (X_train, Y_train) tuple: Keras compatible dataset.
     """
 
     t = datetime.now()
@@ -60,6 +63,8 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, feat
     else:
         Y_train = y_train
 
+    if variable_length:
+        X_train = pad_sequences(X_train, maxlen=max_length)
 
     if verbose:
         print "Training data shape: "+str(X_train.shape)

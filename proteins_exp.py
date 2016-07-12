@@ -19,4 +19,4 @@ model = create_LSTM_model()
 
 print model.summary()
 
-train_LSTM(model, X_train, y_train, 10, 12)
+train_LSTM(model, X_train, y_train, 20, 68)
