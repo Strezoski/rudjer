@@ -8,13 +8,22 @@ from models import *
 seed = 7
 numpy.random.seed(seed)
 
+# X_train, y_train = load_dataset(dataset_path="/home/gjorgji/Desktop/proteinsDataset/sequenceParts/reducedProperties.txt",
+#                                 feature_delimiter=';',
+#                                 feature_member_delimiter=',',
+#                                 features_per_entry=100,
+#                                 verbose=True,
+#                                 lstm_type=True)
 
-X_train, y_train = load_dataset(dataset_path="/home/gjorgji/Desktop/proteinsDataset/sequenceParts/reducedProperties.txt",
+X_train, y_train = load_dataset(dataset_path="/home/gstrezoski/dataset_2/reducedProperties.txt",
                                 feature_delimiter=';',
                                 feature_member_delimiter=',',
                                 features_per_entry=100,
                                 verbose=True,
-                                lstm_type=True)
+                                lstm_type=True,
+                                variable_length=True,
+                                max_length=1500)
+
 model = create_LSTM_model()
 
 print model.summary()

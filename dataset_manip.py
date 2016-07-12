@@ -39,7 +39,7 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, feat
         line_helper = []
 
         split_line = line.split(feature_delimiter)
-        protein_class = int(split_line[features_per_entry])
+        protein_class = int(split_line[-1])
 
         protein_features = split_line[0:features_per_entry]
 
