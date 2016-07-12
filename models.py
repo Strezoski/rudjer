@@ -19,6 +19,9 @@ def create_deep_net():
 def create_LSTM_model():
     # create model
     model = Sequential()
+    M = Masking(mask_value=0.)
+    M._input_shape = (1500, 51)
+    model.add(M)
     model.add(LSTM(360, input_shape=(100, 51), activation='tanh'))
     model.add(Dense(2))
 
