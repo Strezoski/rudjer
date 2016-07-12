@@ -39,15 +39,20 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, feat
         line_helper = []
 
         split_line = line.split(feature_delimiter)
-        protein_class = int(split_line[-1])
+        protein_class = int(split_line[features_per_entry])
 
         protein_features = split_line[0:features_per_entry]
-
+        print len(protein_features)
         for feature in protein_features:
             temp_array = convert_feature_members_float(feature.split(feature_member_delimiter))
             # print len(temp_array)
             # print temp_array
+            # if sum(temp_array)==0:
+            #     temp_array = convert_feature_members_float(feature.split(feature_member_delimiter)[0:51])
+
+
             line_helper.append(temp_array)
+
         # print "Line helper len:"+str(len(line_helper))
 
         X_train_aux.append(line_helper)

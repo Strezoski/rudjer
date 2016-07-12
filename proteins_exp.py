@@ -15,10 +15,10 @@ numpy.random.seed(seed)
 #                                 verbose=True,
 #                                 lstm_type=True)
 
-X_train, y_train = load_dataset(dataset_path="/home/mbrbic/pingvin/data/astral35_random-or-permuted/reducedProperties_padded_test.txt",
+X_train, y_train = load_dataset(dataset_path="/home/gjorgji/Desktop/reducedProperties_padded_test_start.txt",
                                 feature_delimiter=';',
                                 feature_member_delimiter=',',
-                                features_per_entry=100,
+                                features_per_entry=1500,
                                 verbose=True,
                                 lstm_type=True,
                                 variable_length=False,
