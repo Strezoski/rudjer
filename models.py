@@ -20,7 +20,7 @@ def create_LSTM_model():
     # create model
     model = Sequential()
     model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
-    model.add(LSTM(850, activation='tanh', consume_less="mem"))
+    model.add(LSTM(850, activation='tanh'))
     model.add(Dense(2))
 
     return model
