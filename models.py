@@ -20,7 +20,7 @@ def create_LSTM_model():
     # create model
     model = Sequential()
     model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
-    model.add(LSTM(360, activation='tanh'))
+    model.add(LSTM(850, activation='tanh', consume_less="mem"))
     model.add(Dense(2))
 
     return model
@@ -30,8 +30,8 @@ def train_LSTM(model, X_train, Y_train, nb_epoch, batch_size, early_stop=False):
 
     print "\n\nTraining started:\n\n"
 
-    rms_opt = RMSprop(lr=0.00005, rho=0.9, epsilon=1e-08)
-    model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"])
+    rms_opt = RMSprop(lr=0.0001, rho=0.9, epsilon=1e-08)
+    model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"],)
 
     if early_stop:
 
