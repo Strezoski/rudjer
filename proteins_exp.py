@@ -11,11 +11,13 @@ numpy.random.seed(seed)
 dataset_path = "/home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt"
 feature_delimiter = ';'
 feature_member_delimiter = ','
+validation_split = 0.2
 
 x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
                                                             feature_delimiter=feature_delimiter,
                                                             feature_member_delimiter=feature_member_delimiter,
                                                             seed=seed,
+                                                            validation_split=validation_split,
                                                             verbose=True,
                                                             lstm_type=True,
                                                             test_run=True)

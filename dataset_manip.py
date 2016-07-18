@@ -18,7 +18,7 @@ def convert_feature_members_float(feature):
     return tmp_array
 
 
-def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed, verbose=False, lstm_type=True,
+def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed, validation_split=0.2, verbose=False, lstm_type=True,
                  test_run=False):
     """
     Generates the datasets into numpy arrays compatible with Keras.
@@ -32,7 +32,7 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed
 
     t = datetime.now()
     print "\n\n[1] Dataset loading started... \n"
-    print "Time:" + str(t)
+    print "Time: " + str(t)
 
     y_train_aux = []
     X_train = numpy.zeros(shape=(1, 1, 1))
@@ -107,7 +107,7 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed
     else:
         Y_train = y_train
 
-    x_train, x_validation, y_train, y_validation = train_test_split(X_train, Y_train, test_size=0.33, random_state=seed)
+    x_train, x_validation, y_train, y_validation = train_test_split(X_train, Y_train, test_size=validation_split, random_state=seed)
 
     if verbose:
         print "\n\n[4] Dataset summary:"
