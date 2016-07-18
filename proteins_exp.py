@@ -8,15 +8,20 @@ from models import *
 seed = 7
 numpy.random.seed(seed)
 
-X_train, y_train = load_dataset(dataset_path="/home/mbrbic/pingvin/data/astral35_random-or-permuted/reducedProperties_padded.txt",
-                                feature_delimiter=';',
-                                feature_member_delimiter=',',
-                                verbose=True,
-                                lstm_type=True,
-                                test_run=True)
+dataset_path = "/home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt"
+feature_delimiter = ';'
+feature_member_delimiter = ','
 
-model = create_LSTM_model()
+x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
+                                                            feature_delimiter=feature_delimiter,
+                                                            feature_member_delimiter=feature_member_delimiter,
+                                                            seed=seed,
+                                                            verbose=True,
+                                                            lstm_type=True,
+                                                            test_run=True)
+
+model = create_sigmoid_LSTM_model()
 
 print model.summary()
 
-train_LSTM(model, X_train, y_train, 20, 68)
+train_LSTM(model, x_train, y_train, x_validation, y_validation, 20, 16)
