@@ -1,13 +1,13 @@
-import numpy
-import sys
 from dataset_manip import *
 from models import *
 
-print  "\n[DEBUG] Checking input arguments...\n"
+print "\n[DEBUG] Checking input arguments...\n"
 
 if len(sys.argv) != 9:
     print "[ERROR] Input arguments invalid! \n"
     print "Usage: python proteins_exp.py validation_split random_seed epochs learning_rate batch_size k_fold dataset_path test_run\n"
+    print "Example: \n python proteins_exp.py 0 6 3 0.0001 12 2 /home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt 100"
+
 else:
 
     validation_split = float(sys.argv[1])
@@ -17,7 +17,11 @@ else:
     batch_size = int(sys.argv[5])
     k_fold = int(sys.argv[6])
     dataset_path = str(sys.argv[7])
-    test_run = bool(sys.argv[8])
+
+    if int(str(sys.argv[8])) != 0:
+        test_run = True
+    else:
+        test_run = False
 
     print "Dataset: " + str(sys.argv[7])
     print "Validation split: " + str(validation_split)
@@ -28,7 +32,6 @@ else:
     print "K-Fold coeff: " + str(k_fold)
     print "Test run: " + str(test_run)
 
-
     numpy.random.seed(seed)
 
     dataset_path = dataset_path
@@ -36,19 +39,44 @@ else:
     feature_member_delimiter = ','
     validation_split = validation_split
 
-    x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
-                                                                feature_delimiter=feature_delimiter,
-                                                                feature_member_delimiter=feature_member_delimiter,
-                                                                seed=seed,
-                                                                validation_split=validation_split,
-                                                                verbose=True,
-                                                                lstm_type=True,
-                                                                test_run=test_run)
+    if k_fold <= 1:
+        x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
+                                                                    feature_delimiter=feature_delimiter,
+                                                                    feature_member_delimiter=feature_member_delimiter,
+                                                                    seed=seed,
+                                                                    validation_split=validation_split,
+                                                                    verbose=True,
+                                                                    lstm_type=True,
+                                                                    test_run=test_run)
 
-    model = create_sigmoid_LSTM_model()
+        model = create_LSTM_model()
 
-    print "\n\n [5] Model summary: \n"
-    print model.summary()
+        print "\n[5] Model summary: \n"
+        print model.summary()
 
-    print "\n\n [6] Training started: \n"
-    train_LSTM(model, x_train, y_train, x_validation, y_validation, epochs, batch_size, learning_rate)
+        print "\n\n[6] Training started: \n"
+        train_LSTM(model, x_train, y_train, x_validation, y_validation, epochs, batch_size, learning_rate)
+
+    else:
+
+        x_train, y_train = load_dataset_k_fold(dataset_path=dataset_path,
+                                               feature_delimiter=feature_delimiter,
+                                               feature_member_delimiter=feature_member_delimiter,
+                                               verbose=True,
+                                               lstm_type=True,
+                                               test_run=test_run)
+
+        model = create_LSTM_model()
+
+        print "\n[5] Model summary: \n"
+        print model.summary()
+
+
+        print "\n\n[6] ["+str(k_fold)+"-FOLD] Model created and training started: \n"
+
+        train_LSTM_kfold(model=model,
+                         x=x_train,
+                         y=y_train,
+                         nb_epoch=epochs,
+                         batch_size=batch_size,
+                         n_folds=k_fold)

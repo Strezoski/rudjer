@@ -1,7 +1,5 @@
 from keras.callbacks import EarlyStopping
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.cross_validation import cross_val_score
-from sklearn.cross_validation import StratifiedKFold
+from sklearn.cross_validation import KFold
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
@@ -33,7 +31,7 @@ def create_LSTM_model():
     # create model
     model = Sequential()
     model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
-   # model.add(LSTM(1500,activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
+    # model.add(LSTM(1500,activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
     model.add(LSTM(400, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem', return_sequences=True))
     model.add(LSTM(200, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
     model.add(Dropout(0.3))
@@ -96,9 +94,32 @@ def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, ba
                   batch_size=batch_size,
                   verbose=1)
 
-def train_LSTM_kfold(random_seed, X_train, Y_train, create_function=create_sigmoid_LSTM_model, nb_epoch=40, batch_size=64, n_folds=3):
+def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=64, n_folds=3):
 
-    estimator = KerasClassifier(build_fn=create_function, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1)
-    kfold = StratifiedKFold(y=Y_train, n_folds=n_folds, shuffle=True, random_state=random_seed)
-    results = cross_val_score(estimator, X_train, Y_train, cv=kfold)
-    print("Results: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
+    print "\n\n[7] ["+str(n_folds)+"-FOLD] Training started:\n"
+
+    rms_opt = RMSprop(lr=learning_rate, rho=0.9, epsilon=1e-08)
+    model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"],)
+
+    kf = KFold(len(y), n_folds=n_folds)
+
+    current_validation_itteration = 1
+
+    for train, test in kf:
+
+        print "[TRAINING] ["+str(n_folds)+"-FOLD] Currently in #"+str(current_validation_itteration)+" fold.\n"
+
+        current_validation_itteration += 1
+
+        x_train = x[train]
+        x_validation = x[test]
+        y_train = y[train]
+        y_validation = y[test]
+
+        # fit model and score
+        model.fit(x_train,
+                  y_train,
+                  validation_data=(x_validation, y_validation),
+                  nb_epoch=nb_epoch,
+                  batch_size=batch_size,
+                  verbose=1)
