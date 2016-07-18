@@ -81,7 +81,6 @@ def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, ba
                   validation_data=(x_validation, y_validation),
                   nb_epoch=nb_epoch,
                   batch_size=batch_size,
-                  validation_split=0.3,
                   verbose=1,
                   callbacks=[early_stopping])
 
@@ -91,5 +90,4 @@ def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, ba
                   validation_data=(x_validation, y_validation),
                   nb_epoch=nb_epoch,
                   batch_size=batch_size,
-                  validation_split=0.3,
                   verbose=1)
