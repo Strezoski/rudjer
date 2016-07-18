@@ -20,8 +20,11 @@ def create_LSTM_model():
     # create model
     model = Sequential()
     model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
-    model.add(LSTM(850, activation='tanh'))
-    model.add(Dense(2))
+   # model.add(LSTM(1500,activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
+    model.add(LSTM(400, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem', return_sequences=True))
+    model.add(LSTM(200, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
+    model.add(Dropout(0.3))
+    model.add(Dense(2, activation='sigmoid'))
 
     return model
 
