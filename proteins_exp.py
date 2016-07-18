@@ -1,29 +1,54 @@
 import numpy
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.cross_validation import cross_val_score
-from sklearn.cross_validation import StratifiedKFold
+import sys
 from dataset_manip import *
 from models import *
 
-seed = 7
-numpy.random.seed(seed)
+print  "\n[DEBUG] Checking input arguments...\n"
 
-dataset_path = "/home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt"
-feature_delimiter = ';'
-feature_member_delimiter = ','
-validation_split = 0.2
+if len(sys.argv) != 9:
+    print "[ERROR] Input arguments invalid! \n"
+    print "Usage: python proteins_exp.py validation_split random_seed epochs learning_rate batch_size k_fold dataset_path test_run\n"
+else:
 
-x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
-                                                            feature_delimiter=feature_delimiter,
-                                                            feature_member_delimiter=feature_member_delimiter,
-                                                            seed=seed,
-                                                            validation_split=validation_split,
-                                                            verbose=True,
-                                                            lstm_type=True,
-                                                            test_run=True)
+    validation_split = float(sys.argv[1])
+    seed = int(sys.argv[2])
+    epochs = int(sys.argv[3])
+    learning_rate = float(sys.argv[4])
+    batch_size = int(sys.argv[5])
+    k_fold = int(sys.argv[6])
+    dataset_path = str(sys.argv[7])
+    test_run = bool(sys.argv[8])
 
-model = create_sigmoid_LSTM_model()
+    print "Dataset: " + str(sys.argv[7])
+    print "Validation split: " + str(validation_split)
+    print "Radnom seed #: " + str(seed)
+    print "Epochs: " + str(epochs)
+    print "Learning rate:  " + str(learning_rate)
+    print "Batch size: " + str(batch_size)
+    print "K-Fold coeff: " + str(k_fold)
+    print "Test run: " + str(test_run)
 
-print model.summary()
 
-train_LSTM(model, x_train, y_train, x_validation, y_validation, 20, 16)
+    numpy.random.seed(seed)
+
+    dataset_path = dataset_path
+    feature_delimiter = ';'
+    feature_member_delimiter = ','
+    validation_split = validation_split
+
+    x_train, x_validation, y_train, y_validation = load_dataset(dataset_path=dataset_path,
+                                                                feature_delimiter=feature_delimiter,
+                                                                feature_member_delimiter=feature_member_delimiter,
+                                                                seed=seed,
+                                                                validation_split=validation_split,
+                                                                verbose=True,
+                                                                lstm_type=True,
+                                                                test_run=test_run)
+
+    model = create_sigmoid_LSTM_model()
+
+    print "\n\n [5] Model summary: \n"
+    print model.summary()
+
+    print "\n\n [6] Training started: \n"
+    train_LSTM(model, x_train, y_train, x_validation, y_validation, epochs, batch_size, learning_rate)

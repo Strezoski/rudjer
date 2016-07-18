@@ -1,7 +1,10 @@
+from keras.callbacks import EarlyStopping
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.cross_validation import cross_val_score
+from sklearn.cross_validation import StratifiedKFold
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
-from keras.callbacks import EarlyStopping
 import os
 
 def create_deep_net():
@@ -65,12 +68,11 @@ def save_model(model, file_name):
     open('./models/'+file_name+'.json', 'w').write(model_json)
     model.save_weights('./models/'+file_name+'_weights.h5', overwrite=True)
 
-
-def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, batch_size, early_stop=False):
+def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, batch_size, learning_rate=0.0001, early_stop=False,):
 
     print "\n\nTraining started:\n\n"
 
-    rms_opt = RMSprop(lr=0.0001, rho=0.9, epsilon=1e-08)
+    rms_opt = RMSprop(lr=learning_rate, rho=0.9, epsilon=1e-08)
     model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"],)
 
     if early_stop:
@@ -91,3 +93,10 @@ def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, ba
                   nb_epoch=nb_epoch,
                   batch_size=batch_size,
                   verbose=1)
+
+def train_LSTM_kfold(random_seed, X_train, Y_train, create_function=create_sigmoid_LSTM_model, nb_epoch=40, batch_size=64, n_folds=3):
+
+    estimator = KerasClassifier(build_fn=create_function, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1)
+    kfold = StratifiedKFold(y=Y_train, n_folds=n_folds, shuffle=True, random_state=random_seed)
+    results = cross_val_score(estimator, X_train, Y_train, cv=kfold)
+    print("Results: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
