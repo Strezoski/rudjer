@@ -44,6 +44,7 @@ else:
                                                                     feature_delimiter=feature_delimiter,
                                                                     feature_member_delimiter=feature_member_delimiter,
                                                                     seed=seed,
+                                                                    kfold=False,
                                                                     validation_split=validation_split,
                                                                     verbose=True,
                                                                     lstm_type=True,
@@ -51,7 +52,7 @@ else:
 
         model = create_LSTM_model()
 
-        print "\n[5] Model summary: \n"
+        print "\n\n[5] Model summary: \n"
         print model.summary()
 
         print "\n\n[6] Training started: \n"
@@ -59,16 +60,18 @@ else:
 
     else:
 
-        x_train, y_train = load_dataset_k_fold(dataset_path=dataset_path,
-                                               feature_delimiter=feature_delimiter,
-                                               feature_member_delimiter=feature_member_delimiter,
-                                               verbose=True,
-                                               lstm_type=True,
-                                               test_run=test_run)
+        x_train, y_train = load_dataset(dataset_path=dataset_path,
+                                        feature_delimiter=feature_delimiter,
+                                        feature_member_delimiter=feature_member_delimiter,
+                                        seed=seed,
+                                        kfold=True,
+                                        verbose=True,
+                                        lstm_type=True,
+                                        test_run=test_run)
 
         model = create_LSTM_model()
 
-        print "\n[5] Model summary: \n"
+        print "\n\n[5] Model summary: \n"
         print model.summary()
 
 
