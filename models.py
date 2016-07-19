@@ -68,18 +68,20 @@ def save_model(model, file_name):
     open('./models/'+file_name+'.json', 'w').write(model_json)
     model.save_weights('./models/'+file_name+'_weights.h5', overwrite=True)
 
-def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, batch_size, learning_rate=0.0001, early_stop=False,):
+def train_LSTM(model, x_train, y_train, X_validation, Y_validation, nb_epoch, batch_size, learning_rate=0.0001, early_stop=False, train_batch=False):
 
     print "\n\nTraining started:\n\n"
 
     rms_opt = RMSprop(lr=learning_rate, rho=0.9, epsilon=1e-08)
     model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"],)
 
-    if early_stop:
+    if early_stop: #with early stop parameter, mode.fit is always used, check this
 
         early_stopping = EarlyStopping(monitor='val_loss', patience=2)
-        model.fit(X_train,
-                  Y_train,
+        
+        
+        model.fit(x_train,
+                  y_train,
                   validation_data=(x_validation, y_validation),
                   nb_epoch=nb_epoch,
                   batch_size=batch_size,
@@ -87,14 +89,39 @@ def train_LSTM(model, X_train, Y_train, x_validation, y_validation, nb_epoch, ba
                   callbacks=[early_stopping])
 
     else:
-        model.fit(X_train,
-                  Y_train,
-                  validation_data=(x_validation, y_validation),
-                  nb_epoch=nb_epoch,
-                  batch_size=batch_size,
-                  verbose=1)
+        
+        if train_batch:
+            model.train_batch_by_batch(x_train, y_train, x_validation, y_validation, nb_epoch, batch_size)
+        else:       
+            model.fit(x_train,
+                      y_train,
+                      validation_data=(x_validation, y_validation),
+                      nb_epoch=nb_epoch,
+                      batch_size=batch_size,
+                      verbose=1)
+                 
+def train_batch_by_batch(model, x_train, y_train, x_validation, y_validation, nb_epoch, batch_size):              
+     """
+     Train one by one batch of samples.
+     This is for memory optimization: only one batch is transferred to GPU instead of whole dataset. 
+     """
+     indexes = range(len(x_train))
+     
+     for epoch in range(nb_epoch):
+            np.random.shuffle(indexes)
 
-def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=64, n_folds=3):
+            batches = make_batches(len(x_train), batch_size)
+            for batch_index, (batch_start, batch_end) in enumerate(batches):
+                batch_ids = indexes[batch_start:batch_end]
+                X_batch = [x_train[b] for b in batch_ids]
+                Y_batch = [y_train[b] for b in batch_ids]
+                
+                model.train_on_batch(X_batch, Y_batch)
+                
+            model.test_on_batch(x_validation, y_validation, sample_weight=None) #check this
+        
+
+def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=64, n_folds=3, train_batch=False):
 
     print "\n\n[7] ["+str(n_folds)+"-FOLD] Training started:\n"
 
@@ -115,11 +142,14 @@ def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=
         x_validation = x[test]
         y_train = y[train]
         y_validation = y[test]
-
+        
+        if train_batch:
+            model.train_batch_by_batch(x_train, y_train, x_validation, y_validation, nb_epoch, batch_size)
+        else:
         # fit model and score
-        model.fit(x_train,
-                  y_train,
-                  validation_data=(x_validation, y_validation),
-                  nb_epoch=nb_epoch,
-                  batch_size=batch_size,
-                  verbose=1)
+            model.fit(x_train,
+                      y_train,
+                      validation_data=(x_validation, y_validation),
+                      nb_epoch=nb_epoch,
+                      batch_size=batch_size,
+                      verbose=1)
