@@ -7,7 +7,8 @@ if len(sys.argv) != 9:
     print "[ERROR] Input arguments invalid! \n"
     print "Usage: python proteins_exp.py validation_split random_seed epochs learning_rate batch_size k_fold dataset_path test_run\n"
     print "Example: \n python proteins_exp.py 0 6 3 0.0001 12 2 /home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt 100"
-
+    print "Eto me... :)"
+    print "NOvo"
 else:
 
     validation_split = float(sys.argv[1])
