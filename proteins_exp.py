@@ -3,12 +3,11 @@ from models import *
 
 print "\n[DEBUG] Checking input arguments...\n"
 
-if len(sys.argv) != 9:
+if len(sys.argv) != 10:
     print "[ERROR] Input arguments invalid! \n"
-    print "Usage: python proteins_exp.py validation_split random_seed epochs learning_rate batch_size k_fold dataset_path test_run\n"
-    print "Example: \n python proteins_exp.py 0 6 3 0.0001 12 2 /home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt 100"
-    print "Eto me... :)"
-    print "NOvo"
+    print "Usage: python proteins_exp.py validation_split random_seed epochs learning_rate batch_size k_fold train_batch dataset_path test_run\n"
+    print "Example: \n python proteins_exp.py 0 6 3 0.0001 12 2 0 /home/gjorgji/Desktop/reducedProperties_padded_test_hlf.txt 100"
+
 else:
 
     validation_split = float(sys.argv[1])
@@ -17,20 +16,22 @@ else:
     learning_rate = float(sys.argv[4])
     batch_size = int(sys.argv[5])
     k_fold = int(sys.argv[6])
-    dataset_path = str(sys.argv[7])
+    train_batch = bool(int(sys.argv[7]))
+    dataset_path = str(sys.argv[8])
 
-    if int(str(sys.argv[8])) != 0:
+    if int(str(sys.argv[9])) != 0:
         test_run = True
     else:
         test_run = False
 
-    print "Dataset: " + str(sys.argv[7])
+    print "Dataset: " + str(dataset_path)
     print "Validation split: " + str(validation_split)
-    print "Radnom seed #: " + str(seed)
+    print "Random seed #: " + str(seed)
     print "Epochs: " + str(epochs)
     print "Learning rate:  " + str(learning_rate)
     print "Batch size: " + str(batch_size)
     print "K-Fold coeff: " + str(k_fold)
+    print "Train batch by batch: " + str(train_batch)
     print "Test run: " + str(test_run)
 
     numpy.random.seed(seed)
@@ -57,7 +58,8 @@ else:
         print model.summary()
 
         print "\n\n[6] Training started: \n"
-        train_LSTM(model, x_train, y_train, x_validation, y_validation, epochs, batch_size, learning_rate)
+        train_LSTM(model, x_train, y_train, x_validation, y_validation, epochs, batch_size,
+                   learning_rate, train_batch=train_batch)
 
     else:
 
@@ -83,4 +85,4 @@ else:
                          y=y_train,
                          nb_epoch=epochs,
                          batch_size=batch_size,
-                         n_folds=k_fold)
+                         n_folds=k_fold, train_batch=train_batch)
