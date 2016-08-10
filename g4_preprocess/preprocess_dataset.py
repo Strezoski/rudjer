@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from random import shuffle
 
 MIN_LENGTH = 60
 
@@ -13,9 +14,10 @@ def read_data(dataset_path):
     for line in open(dataset_path):
         if line[0] == '>':
             continue
-        if len(line) < MIN_LENGTH:
+        line = line.upper().strip()
+        if (len(line)-line.count('N')) < MIN_LENGTH:  # N denotes any nucleotide
             continue
-        seq.append(line.upper())
+        seq.append(line.upper().strip())
     return seq
 
 
@@ -58,7 +60,6 @@ def equalize_length_dist(ref_array, change_array):
         num = int(round(ref_dist[length]*len(change_array), 0))
         for i in range(position, position+num):
             best_subseq = get_g_abundant_subseq(change_array[i], length)
-            # print change_array[i]+' '+best_subseq
             if best_subseq != '':
                 new_array.append(best_subseq)
         position += num
@@ -130,27 +131,31 @@ def write_training_data(output_path, pos_seq, neg_seq):
     num_instances = len(pos_seq)+len(neg_seq)
     out_file.write('%d, %d, %d\n' % (num_instances, max_length, 4))
     code = encode_sequence()
-    write_sequences(out_file, pos_seq, 1, code, max_length)
-    write_sequences(out_file, neg_seq, 0, code, max_length)
+    all_seq = [s + ';1' for s in pos_seq]+[s + ';0' for s in neg_seq]
+    shuffle(all_seq)
+    write_sequences(out_file, all_seq, code, max_length)
 
 
-def write_sequences(out_file, seq_list, label, code, max_length):
+def write_sequences(out_file, instances, code, max_length):
     """
     Writes sequences in file.
     :param out_file:
-    :param seq_list: sequences to write
-    :param label: class label
+    :param instances: sequences with class label
     :param code: binary code of nucleotides
     :param max_length: length of  the longest sequence
     :return:
     """
-    for seq in seq_list:
-        padding_position = max_length-len(seq)
+    for inst in instances:
+        inst_el = inst.split(';')
+        seq = inst_el[0]
+        label = inst_el[1]
+        padding_position = max_length-(len(seq)-seq.count('N'))  # N denotes any nucleotide
         out_file.write('%d;' % padding_position)
         for ncl in seq:
-            if code.__contains__(ncl):
-                out_file.write('%s;' % code[ncl])
-        out_file.write('%d\n' % label)
+            if ncl == 'N':
+                continue
+            out_file.write('%s;' % code[ncl])
+        out_file.write('%s\n' % label)
 
 
 negative_seq = read_data('/media/maria/Windows/Documents and Settings/maria/Documents/My projects/'
@@ -164,10 +169,8 @@ positive_seq = read_data('/media/maria/Windows/Documents and Settings/maria/Docu
 # negative_seq = equalize_length_dist(a, b)
 
 negative_seq = equalize_length_dist(positive_seq, negative_seq)
-print len(negative_seq)
-print len(positive_seq)
 # plot_dist(negative_seq)
 # plot_dist(positive_seq)
 # plot_dist(negative_seq, key='g')
 # plot_dist(positive_seq, key='g')
-write_training_data('/home/maria/PycharmProjects/G4Quadruplex/out.txt', positive_seq, negative_seq)
+write_training_data('/home/maria/PycharmProjects/G4Quadruplex/g4_training_set.txt', positive_seq, negative_seq)
