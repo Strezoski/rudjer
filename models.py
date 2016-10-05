@@ -6,6 +6,7 @@ from keras.optimizers import *
 import os
 import numpy
 
+
 def create_deep_net():
     # create model
     model = Sequential()
@@ -15,8 +16,8 @@ def create_deep_net():
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-
     return model
+
 
 def create_tanh_LSTM_model():
     # create model
@@ -28,10 +29,12 @@ def create_tanh_LSTM_model():
 
     return model
 
-def create_LSTM_model():
+
+def create_LSTM_model(cur_input_shape=(1500, 51)):
     # create model
     model = Sequential()
-    model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
+    # model.add(Masking(mask_value=0. ,input_shape=(1500, 51)))
+    model.add(Masking(mask_value=0., input_shape=cur_input_shape))
     # model.add(LSTM(1500,activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
     model.add(LSTM(400, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem', return_sequences=True))
     model.add(LSTM(200, activation='tanh', inner_activation='hard_sigmoid', consume_less='mem'))
@@ -39,6 +42,7 @@ def create_LSTM_model():
     model.add(Dense(2, activation='sigmoid'))
 
     return model
+
 
 def create_tanh_dropout_LSTM_model():
     # create model
@@ -50,6 +54,7 @@ def create_tanh_dropout_LSTM_model():
 
     return model
 
+
 def create_sigmoid_LSTM_model():
     # create model
     model = Sequential()
@@ -60,6 +65,7 @@ def create_sigmoid_LSTM_model():
 
     return model
 
+
 def save_model(model, file_name):
 
     if not os.path.exists('./models/'):
@@ -69,17 +75,18 @@ def save_model(model, file_name):
     open('./models/'+file_name+'.json', 'w').write(model_json)
     model.save_weights('./models/'+file_name+'_weights.h5', overwrite=True)
 
-def train_LSTM(model, x_train, y_train, x_validation, y_validation, nb_epoch, batch_size, learning_rate=0.0001, early_stop=False, train_batch=False):
+
+def train_LSTM(model, x_train, y_train, x_validation, y_validation, nb_epoch, batch_size, learning_rate=0.0001,
+               early_stop=False, train_batch=False):
 
     print "\n\nTraining started:\n\n"
 
     rms_opt = RMSprop(lr=learning_rate, rho=0.9, epsilon=1e-08)
     model.compile(optimizer=rms_opt, loss='binary_crossentropy', metrics=["accuracy"],)
 
-    if early_stop: #model.fit is always used with early stop parameter
+    if early_stop:  # model.fit is always used with early stop parameter
 
         early_stopping = EarlyStopping(monitor='val_loss', patience=2)
-        
         
         model.fit(x_train,
                   y_train,
@@ -100,7 +107,8 @@ def train_LSTM(model, x_train, y_train, x_validation, y_validation, nb_epoch, ba
                       nb_epoch=nb_epoch,
                       batch_size=batch_size,
                       verbose=1)
-                 
+
+
 def train_batch_by_batch(model, x_train, y_train, x_validation, y_validation, nb_epoch, batch_size):
      """
      Train one by one batch of samples.
@@ -130,11 +138,17 @@ def train_batch_by_batch(model, x_train, y_train, x_validation, y_validation, nb
             loss, acc = model.test_on_batch(x_validation, y_validation)
             print 'val_loss: %.3f - val_acc: %3f' % (float(loss), float(acc))
 
+
 def split_in_batches(size, batch_size):
-    '''Returns a list of batch indices (tuples of indices).
-    '''
+    """
+    :param size:
+    :param batch_size:
+    :return: a list of batch indices (tuples of indices)
+    """
     nb_batch = int(np.ceil(size / float(batch_size)))
+
     return [(i * batch_size, min(size, (i + 1) * batch_size)) for i in range(0, nb_batch)]
+
 
 def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=64, n_folds=3, train_batch=False):
 
@@ -145,13 +159,13 @@ def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=
 
     kf = KFold(len(y), n_folds=n_folds)
 
-    current_validation_itteration = 1
+    current_validation_iteration = 1
 
     for train, test in kf:
 
-        print "[TRAINING] ["+str(n_folds)+"-FOLD] Currently in #"+str(current_validation_itteration)+" fold.\n"
+        print "[TRAINING] ["+str(n_folds)+"-FOLD] Currently in #"+str(current_validation_iteration)+" fold.\n"
 
-        current_validation_itteration += 1
+        current_validation_iteration += 1
 
         x_train = x[train]
         x_validation = x[test]
@@ -160,8 +174,7 @@ def train_LSTM_kfold(model, x, y, learning_rate=0.0001, nb_epoch=40, batch_size=
         
         if train_batch:
             train_batch_by_batch(model, x_train, y_train, x_validation, y_validation, nb_epoch, batch_size)
-        else:
-        # fit model and score
+        else:  # fit model and score
             model.fit(x_train,
                       y_train,
                       validation_data=(x_validation, y_validation),

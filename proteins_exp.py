@@ -52,7 +52,7 @@ else:
                                                                     lstm_type=True,
                                                                     test_run=test_run)
 
-        model = create_LSTM_model()
+        model = create_LSTM_model(cur_input_shape=(x_train.shape[1], x_train.shape[2]))
 
         print "\n\n[5] Model summary: \n"
         print model.summary()

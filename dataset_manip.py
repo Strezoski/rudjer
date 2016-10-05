@@ -17,8 +17,8 @@ def convert_feature_members_float(feature):
     return tmp_array
 
 
-def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed, kfold=False, validation_split=0.2, verbose=True, lstm_type=True,
-                 test_run=False):
+def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed, kfold=False, validation_split=0.2,
+                 verbose=True, lstm_type=True, test_run=False):
     """
     Generates the datasets into numpy arrays compatible with Keras.
     :param dataset_path: The path to the textual file containing the dataset.
@@ -43,6 +43,7 @@ def load_dataset(dataset_path, feature_delimiter, feature_member_delimiter, seed
         if counter == 0:
 
             speciments_number = int(line.split(feature_member_delimiter)[0])
+            print "Number of speciments:" + str(speciments_number)
             max_dimension = int(line.split(feature_member_delimiter)[1])
             feature_dims = int(line.split(feature_member_delimiter)[2].strip())
 
