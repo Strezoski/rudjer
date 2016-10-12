@@ -1,3 +1,4 @@
+from __future__ import division
 from dataset_manip import *
 from models import *
 
@@ -52,6 +53,32 @@ else:
                                                                     lstm_type=True,
                                                                     test_run=test_run)
 
+        f = open('/home/maria/rfData_train', 'w')
+        for i in range(x_train.shape[0]):
+            count = np.zeros(4)
+            for j in range(x_train.shape[1]):
+                x_element = x_train[i][j]
+                if np.sum(x_element) == 1:
+                    idx = np.where(x_element == 1)[0][0]
+                    count[idx] += 1
+            for j in range(4):
+                f.write(str(count[j] / np.sum(count)) + ",")
+            f.write(str(int(y_train[i][0])) + "\n")
+        f.close()
+
+        f = open('/home/maria/rfData_valid', 'w')
+        for i in range(x_validation.shape[0]):
+            count = np.zeros(4)
+            for j in range(x_validation.shape[1]):
+                x_element = x_validation[i][j]
+                if np.sum(x_element) == 1:
+                    idx = np.where(x_element == 1)[0][0]
+                    count[idx] += 1
+            for j in range(4):
+                f.write(str(count[j] / np.sum(count)) + ",")
+            f.write(str(int(y_validation[i][0])) + "\n")
+        f.close()
+
         model = create_LSTM_model(cur_input_shape=(x_train.shape[1], x_train.shape[2]))
 
         print "\n\n[5] Model summary: \n"
@@ -85,4 +112,5 @@ else:
                          y=y_train,
                          nb_epoch=epochs,
                          batch_size=batch_size,
-                         n_folds=k_fold, train_batch=train_batch)
+                         n_folds=k_fold,
+                         train_batch=train_batch)
