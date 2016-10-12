@@ -53,7 +53,7 @@ else:
                                                                     lstm_type=True,
                                                                     test_run=test_run)
 
-        f = open('~/rfData_train', 'w')
+        f = open('rfData_train', 'w')
         for i in range(x_train.shape[0]):
             count = np.zeros(4)
             for j in range(x_train.shape[1]):
@@ -66,7 +66,7 @@ else:
             f.write(str(int(y_train[i][0])) + "\n")
         f.close()
 
-        f = open('~/rfData_valid', 'w')
+        f = open('rfData_valid', 'w')
         for i in range(x_validation.shape[0]):
             count = np.zeros(4)
             for j in range(x_validation.shape[1]):
